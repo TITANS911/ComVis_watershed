@@ -1,0 +1,52 @@
+
+======================================================================
+DRAF ANALISIS LAPORAN - CASE1
+======================================================================
+
+1. KARAKTERISTIK GAMBAR
+-----------------------
+- Objek: biji kopi sangrai cokelat gelap, oval dengan alur tengah, orientasi acak.
+- Latar putih bersih, kontras objek-latar tinggi (histogram cenderung bimodal,
+  cocok untuk Otsu).
+- Jumlah objek hasil hitung manual: 10 biji.
+- Estimasi dari total luas foreground / luas biji tunggal: ~10.0
+  (pembanding kasar; biji yang menumpuk menutupi sebagian luasnya).
+- Tekstur permukaan (kilap dan bayangan alur) dapat menimbulkan variasi
+  intensitas di dalam objek.
+
+2. PERFORMA OTSU THRESHOLDING
+-----------------------------
+- Threshold otomatis Otsu: 166.
+- Jumlah objek terdeteksi: 10 (selisih +0 terhadap manual)
+  -> sesuai dengan acuan jumlah objek.
+- Kelebihan: sederhana, cepat (32.69 ms), tanpa threshold manual,
+  sangat baik memisahkan objek dari latar putih.
+- Kekurangan: hanya melihat intensitas, tidak mengenal bentuk. Biji yang
+  bersentuhan menjadi satu komponen terhubung sehingga terhitung satu objek.
+
+3. PERFORMA WATERSHED SEGMENTATION
+----------------------------------
+- Jumlah objek terdeteksi: 10 (selisih +0 terhadap manual)
+  -> sesuai dengan acuan jumlah objek.
+- Watershed memakai distance transform: tiap biji (oval, cembung) memberi
+  puncak jarak sendiri sebagai marker, lalu garis batas dibuat pada lekukan
+  di antara biji yang menempel. Komponen yang luasnya jauh di atas biji tunggal
+  diberi marker tambahan dengan K-Means.
+- Kekurangan: sensitif terhadap parameter (rasio threshold distance map).
+  Rasio terlalu rendah -> marker menyatu; terlalu tinggi -> biji oval panjang
+  bisa terpecah atau marker hilang.
+- Waktu komputasi: 280.69 ms.
+
+4. TABEL PERBANDINGAN
+---------------------
+| Kriteria                  | Otsu Thresholding | Watershed         |
+|---------------------------|-------------------|-------------------|
+| Jumlah objek manual       | 10                | 10                |
+| Jumlah objek terdeteksi   | 10                | 10                |
+| Selisih thd manual        | +0                | +0                |
+| Waktu komputasi           | 32.69          ms | 280.69         ms |
+| Kompleksitas metode       | Rendah            | Sedang-tinggi     |
+
+5. KESIMPULAN
+-------------
+Pada case1, Otsu dan Watershed memberi selisih yang sama terhadap hitungan manual (10): Otsu +0, Watershed +0. Karena hasilnya sama, Otsu lebih unggul dari sisi kesederhanaan dan kecepatan, sedangkan Watershed tidak memberi keuntungan pada kasus ini.
